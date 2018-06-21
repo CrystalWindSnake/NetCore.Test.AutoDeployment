@@ -1,0 +1,33 @@
+version: '3'
+services:
+    web: 
+      container_name: ${cp_main_name}
+      build:
+        context: .
+        dockerfile: Dockerfile-web
+      command: ["/src","${cp_pj_name}","/published","${cp_pj_name}.dll"]
+      image: carson/${cp_main_name}
+      restart: on-failure
+      expose:
+        - "80"
+      volumes: 
+        - "./${cp_src_dir}:/src"
+        - "./${cp_published_dir}:/published"
+      networks:
+        - auto-ci-nw
+
+    nginx:
+      container_name: ${cp_main_name}-nginx
+      image: nginx:latest
+      ports:
+        - "${cp_ng_host_port}:80"
+      links:
+        - web:web
+      restart: always
+      volumes:
+        - "./nginx-about/conf.d:/etc/nginx/conf.d"
+      networks:
+        - auto-ci-nw
+                
+networks:
+  auto-ci-nw:

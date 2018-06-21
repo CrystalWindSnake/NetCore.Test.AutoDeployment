@@ -1,0 +1,61 @@
+version: '3'
+services:
+    web-git: 
+      container_name: ${cp_main_name}-git
+      build:
+        context: .
+        dockerfile: Dockerfile-web-git
+      command: ["/src","${cp_git_address}"]
+      image: carson/${cp_main_name}-git
+      volumes: 
+        - "./src:/src"
+        - "~/.ssh:/root/.ssh:ro"
+
+    web-publish: 
+      container_name: ${cp_main_name}-publish
+      build:
+        context: .
+        dockerfile: Dockerfile-web-publish
+        args:
+          - pj_name=${cp_pj_name}
+      image: carson/${cp_main_name}-publish
+      depends_on:
+        - web-git
+      restart: on-failure
+      volumes: 
+        - "./src:/src"
+        - "./published:/published"
+
+    web: 
+      container_name: ${cp_main_name}
+      build:
+        context: .
+        dockerfile: Dockerfile-web
+      command: ["${cp_pj_name}.dll"]
+      image: carson/${cp_main_name}
+      depends_on:
+        - web-git
+        - web-publish
+      restart: always
+      expose:
+        - "80"
+      volumes: 
+        - "./published:/published"
+      networks:
+        - auto-ci-nw
+
+    nginx:
+      container_name: ${cp_main_name}-nginx
+      image: nginx:latest
+      ports:
+        - "${cp_ng_host_port}:80"
+      links:
+        - web:web
+      restart: always
+      volumes:
+        - "./nginx-about/conf.d:/etc/nginx/conf.d"
+      networks:
+        - auto-ci-nw
+                
+networks:
+  auto-ci-nw:

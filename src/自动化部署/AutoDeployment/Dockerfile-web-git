@@ -1,0 +1,3 @@
+FROM carson/git-base
+WORKDIR /src
+ENTRYPOINT ["sh","/sh/pull_cp.sh"]

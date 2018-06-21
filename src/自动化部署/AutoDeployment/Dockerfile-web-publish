@@ -1,0 +1,6 @@
+FROM microsoft/dotnet
+ARG pj_name
+RUN mkdir /published
+WORKDIR /src/${pj_name}
+ENTRYPOINT [ "/usr/bin/dotnet","publish","-o","/published" , "-c","release" ]
+

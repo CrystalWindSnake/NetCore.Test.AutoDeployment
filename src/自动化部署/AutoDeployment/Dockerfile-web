@@ -1,0 +1,4 @@
+FROM microsoft/dotnet
+WORKDIR /published
+ENTRYPOINT ["/usr/bin/dotnet"]
+CMD ["--help"]

@@ -1,0 +1,3 @@
+FROM carson/dotnet-base
+ENTRYPOINT ["sh","/sh/handle.sh"]
+CMD ["--help"]
